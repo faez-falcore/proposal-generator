@@ -29,9 +29,9 @@ export function InvestmentSection({
         const els = sectionRef.current?.querySelectorAll(".inv-reveal");
         if (!els) return;
         els.forEach((el, i) => {
-          gsap.fromTo(el, { y: MOTION.yFrom, opacity: 0 }, {
-            y: 0, opacity: 1, duration: MOTION.base,
-            delay: i * MOTION.stagger,
+          gsap.fromTo(el, { y: MOTION.yFrom * 2, opacity: 0 }, {
+            y: 0, opacity: 1, duration: MOTION.slow,
+            delay: i * 0.15,
             ease: MOTION.easeOut,
             scrollTrigger: { trigger: sectionRef.current, start: MOTION.scrollStart },
           });
@@ -41,42 +41,76 @@ export function InvestmentSection({
   }, []);
 
   return (
-    <Section ref={sectionRef}>
+    <Section ref={sectionRef} className="py-20 md:py-28">
       <Eyebrow>Investment</Eyebrow>
 
-      <div className="grid md:grid-cols-2 gap-6 md:gap-8 mb-12">
-        <div className="inv-reveal opacity-0 border border-[color:var(--border)] rounded-[var(--r-card-lg)] p-6 md:p-8">
-          <p className="text-sm opacity-50 mb-2">Total Project Investment</p>
-          <p className="text-4xl md:text-5xl font-black tabular-nums" style={{ color: "var(--accent)" }}>
-            {fmt(totalPriceCents, currency)}
-          </p>
-          {milestoneCents && (
-            <p className="mt-4 text-sm opacity-60">
-              50% milestone: <span className="font-semibold">{fmt(milestoneCents, currency)}</span>
-            </p>
-          )}
-        </div>
+      <div className="mt-6 md:mt-8">
+        <p
+          className="text-xs uppercase tracking-widest opacity-35 mb-3"
+          style={{ letterSpacing: "0.2em" }}
+        >
+          Total Project Investment
+        </p>
+        <p
+          className="inv-reveal opacity-0 tabular-nums leading-none"
+          style={{
+            fontFamily: "var(--font-display)",
+            fontSize: "var(--fs-h1)",
+            fontWeight: 300,
+            fontStyle: "italic",
+            color: "var(--accent)",
+            letterSpacing: "var(--tracking-tight)",
+          }}
+        >
+          {fmt(totalPriceCents, currency)}
+        </p>
 
-        {retainerPriceCents && (
-          <div className="inv-reveal opacity-0 border border-[color:var(--border)] rounded-[var(--r-card-lg)] p-6 md:p-8">
-            <p className="text-sm opacity-50 mb-2">Monthly Retainer (ongoing)</p>
-            <p className="text-4xl md:text-5xl font-black tabular-nums" style={{ color: "var(--accent)" }}>
-              {fmt(retainerPriceCents, currency)}
-              <span className="text-xl opacity-50">/mo</span>
-            </p>
-            {retainerBullets.length > 0 && (
-              <ul className="mt-6 space-y-2">
-                {retainerBullets.map((b, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm opacity-70">
-                    <span className="mt-0.5 w-1.5 h-1.5 rounded-full shrink-0" style={{ background: "var(--accent)" }} />
-                    {b}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+        {milestoneCents && (
+          <p className="mt-5 text-sm opacity-45">
+            First milestone (50%):{" "}
+            <span className="font-semibold opacity-80">{fmt(milestoneCents, currency)}</span>
+          </p>
         )}
       </div>
+
+      {retainerPriceCents && (
+        <div className="inv-reveal opacity-0 mt-20 md:mt-28 border-t border-[color:var(--border)] pt-12 md:pt-16">
+          <p
+            className="text-xs uppercase tracking-widest opacity-35 mb-3"
+            style={{ letterSpacing: "0.2em" }}
+          >
+            Monthly Retainer
+          </p>
+          <p
+            className="tabular-nums leading-none"
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "clamp(2rem, 5vw, 4.5rem)",
+              fontWeight: 300,
+              fontStyle: "italic",
+              color: "oklch(from var(--accent) l c h / 0.55)",
+              letterSpacing: "var(--tracking-tight)",
+            }}
+          >
+            {fmt(retainerPriceCents, currency)}
+            <span style={{ fontSize: "0.3em", opacity: 0.65, fontStyle: "normal" }}>/mo</span>
+          </p>
+
+          {retainerBullets.length > 0 && (
+            <ul className="mt-10 space-y-3 max-w-md">
+              {retainerBullets.map((b, i) => (
+                <li key={i} className="flex items-start gap-3 text-sm opacity-55">
+                  <span
+                    className="mt-2 w-1 h-1 rounded-full shrink-0"
+                    style={{ background: "var(--accent)" }}
+                  />
+                  {b}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
     </Section>
   );
 }

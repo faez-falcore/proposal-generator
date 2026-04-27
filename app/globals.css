@@ -318,6 +318,7 @@ body {
   --fs-script:      clamp(2.75rem, 5.5vw, 5rem);
   --fs-script-sm:   clamp(1.5rem, 2.6vw, 2.2rem);
   --fs-display:     clamp(3.5rem, 18vw, 14rem);
+  --fs-numeral:     clamp(5rem, 14vw, 12rem);
 
   --tracking-eyebrow: 0.25em;
   --tracking-tight:   -0.03em;

@@ -48,19 +48,21 @@ export function SignatureSection({ proposalId, clientSignedAt, stripeLink, statu
   }
 
   return (
-    <Section ref={sectionRef} narrow>
-      <Eyebrow>Sign & Proceed</Eyebrow>
-
+    <Section ref={sectionRef} narrow className="py-20 md:py-28">
       {signed ? (
         <div className="text-center py-16">
-          <div className="text-5xl mb-6">✓</div>
-          <h2 className="text-[var(--fs-h2)] font-black mb-4" style={{ fontFamily: "var(--font-body)" }}>
+          <div
+            className="mb-6"
+            style={{ fontFamily: "var(--font-display)", fontStyle: "italic", fontSize: "3rem", color: "var(--accent)" }}
+          >
+            ✓
+          </div>
+          <h2 className="mb-4" style={{ fontFamily: "var(--font-body)", fontSize: "var(--fs-h2)", fontWeight: 700 }}>
             Proposal Signed
           </h2>
-          <p className="opacity-60 mb-8">
+          <p className="opacity-55 mb-10 text-base">
             Your signature has been received. We&apos;ll counter-sign and send you a confirmation.
           </p>
-
           {showStripe && (
             <a
               href={stripeLink}
@@ -78,27 +80,67 @@ export function SignatureSection({ proposalId, clientSignedAt, stripeLink, statu
         </div>
       ) : canSign ? (
         <div>
-          <h2 className="text-[var(--fs-h2)] font-black mb-6" style={{ fontFamily: "var(--font-body)" }}>
-            Sign the Proposal
-          </h2>
-          <p className="opacity-60 mb-8">
-            By signing below, you agree to the terms and confirm your intent to proceed.
+          <Eyebrow>Sign & Proceed</Eyebrow>
+          <p
+            className="mb-2 leading-tight"
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "var(--fs-h2)",
+              fontStyle: "italic",
+              fontWeight: 300,
+              letterSpacing: "var(--tracking-tight)",
+            }}
+          >
+            This is where it begins.
+          </p>
+          <p className="opacity-50 mb-8 text-sm leading-relaxed">
+            Draw your signature in the field below to agree to the terms and confirm your intent to proceed.
           </p>
 
           <div
-            className="border-2 rounded-[var(--r-card-lg)] overflow-hidden mb-6"
-            style={{ borderColor: "var(--accent)" }}
+            className="relative mb-2"
+            style={{
+              border: "1.5px solid oklch(from var(--accent) l c h / 0.3)",
+              borderRadius: "var(--r-card)",
+              background: "oklch(from var(--fg) l c h / 0.03)",
+              minHeight: "260px",
+            }}
           >
             <SignatureCanvas
               ref={sigRef}
               penColor={accentColor}
-              canvasProps={{ className: "w-full", height: 200, style: { background: "white" } }}
+              canvasProps={{
+                style: {
+                  width: "100%",
+                  height: "260px",
+                  display: "block",
+                  background: "transparent",
+                  borderRadius: "var(--r-card)",
+                },
+              }}
             />
+            <div
+              className="absolute pointer-events-none"
+              style={{ bottom: "40px", left: "20px", right: "20px", height: "1px", background: "var(--fg)", opacity: 0.12 }}
+            />
+            <span
+              className="absolute pointer-events-none select-none"
+              style={{
+                bottom: "12px",
+                left: "20px",
+                fontSize: "0.65rem",
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                opacity: 0.3,
+              }}
+            >
+              Signature
+            </span>
           </div>
 
           {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
 
-          <div className="flex gap-4 flex-wrap">
+          <div className="flex gap-3 flex-wrap mt-5">
             <Button onClick={handleSign} disabled={signing} size="md">
               {signing ? "Submitting…" : "Confirm Signature"}
             </Button>
@@ -108,7 +150,7 @@ export function SignatureSection({ proposalId, clientSignedAt, stripeLink, statu
           </div>
         </div>
       ) : (
-        <div className="text-center py-16 opacity-40">
+        <div className="text-center py-16 opacity-35">
           <p>This proposal is not yet open for signing.</p>
         </div>
       )}

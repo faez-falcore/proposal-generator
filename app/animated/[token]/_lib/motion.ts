@@ -1,7 +1,7 @@
 export const MOTION = {
-  easeOut: "power3.out",
-  easeIn: "power3.in",
-  easeInOut: "power2.inOut",
+  easeOut: "power4.out",
+  easeIn: "power4.in",
+  easeInOut: "power3.inOut",
   fast: 0.4,
   base: 0.7,
   slow: 1.1,

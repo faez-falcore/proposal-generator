@@ -3,14 +3,13 @@
 import { useEffect, useRef, useState } from "react";
 import { MOTION } from "../_lib/motion";
 import { Section } from "./_ui/Section";
-import { Eyebrow } from "./_ui/Eyebrow";
 
 interface Props {
   guaranteeText: string;
   phaseTwoTeaser: string | null;
 }
 
-const TYPEWRITER_MS = 18;
+const TYPEWRITER_MS = 20;
 
 export function GuaranteeSection({ guaranteeText, phaseTwoTeaser }: Props) {
   const sectionRef = useRef<HTMLElement>(null);
@@ -43,22 +42,53 @@ export function GuaranteeSection({ guaranteeText, phaseTwoTeaser }: Props) {
   }, [started, guaranteeText]);
 
   return (
-    <Section ref={sectionRef}>
-      <Eyebrow>Our Guarantee</Eyebrow>
+    <Section
+      ref={sectionRef}
+      bleed
+      className="py-24 md:py-36"
+      style={{
+        background: "var(--accent)",
+      }}
+    >
+      <div className="px-6 md:px-16 lg:px-24 max-w-5xl mx-auto">
+        <p
+          className="text-xs uppercase font-medium mb-8"
+          style={{ letterSpacing: "0.25em", color: "oklch(from var(--accent) 0.95 0.02 h)" }}
+        >
+          Our Guarantee
+        </p>
 
-      <blockquote
-        className="text-xl md:text-2xl leading-relaxed border-l-4 pl-6 md:pl-8 py-2"
-        style={{ borderColor: "var(--accent)" }}
-      >
-        {displayedText}
-        {started && displayedText.length < guaranteeText.length && (
-          <span className="animate-pulse">|</span>
+        <blockquote
+          className="leading-snug"
+          style={{
+            fontFamily: "var(--font-display)",
+            fontSize: "var(--fs-h2)",
+            fontStyle: "italic",
+            fontWeight: 300,
+            letterSpacing: "var(--tracking-tight)",
+            color: "oklch(1 0 0)",
+          }}
+        >
+          {displayedText}
+          {started && displayedText.length < guaranteeText.length && (
+            <span
+              className="animate-pulse"
+              style={{ color: "oklch(1 0 0 / 0.5)" }}
+            >
+              |
+            </span>
+          )}
+        </blockquote>
+
+        {phaseTwoTeaser && (
+          <p
+            className="mt-10 md:mt-14 text-base max-w-2xl"
+            style={{ color: "oklch(1 0 0 / 0.65)" }}
+          >
+            {phaseTwoTeaser}
+          </p>
         )}
-      </blockquote>
-
-      {phaseTwoTeaser && (
-        <p className="mt-8 md:mt-12 text-base opacity-60 max-w-2xl">{phaseTwoTeaser}</p>
-      )}
+      </div>
     </Section>
   );
 }

@@ -15,40 +15,54 @@ export function TermsSection({ terms }: Props) {
   return (
     <Section>
       <Eyebrow>Terms & Conditions</Eyebrow>
-      <p className="text-lg md:text-xl opacity-80 mb-8 md:mb-12">Mutual agreements that protect us both.</p>
+      <p className="text-lg md:text-xl opacity-70 mb-10 md:mb-14">
+        Mutual agreements that protect us both.
+      </p>
 
-      <div className="space-y-3">
-        {terms.map((clause) => (
-          <div
-            key={clause.clause_no}
-            className="border border-[color:var(--border)] rounded-[var(--r-card)] overflow-hidden"
-          >
-            <button
-              className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-current/5 transition-colors"
-              onClick={() => setOpen(open === clause.clause_no ? null : clause.clause_no)}
-            >
-              <span className="flex items-center gap-4">
-                <span className="text-xs opacity-40 font-mono">{clause.clause_no}</span>
-                <span className="font-semibold">{clause.title}</span>
-              </span>
-              <span
-                className="text-lg transition-transform"
-                style={{
-                  color: "var(--accent)",
-                  transform: open === clause.clause_no ? "rotate(45deg)" : "none",
-                }}
+      <div>
+        {terms.map((clause) => {
+          const isOpen = open === clause.clause_no;
+          return (
+            <div key={clause.clause_no} className="border-t border-[color:var(--border)]">
+              <button
+                className="w-full flex items-center justify-between py-5 md:py-6 text-left group"
+                onClick={() => setOpen(isOpen ? null : clause.clause_no)}
               >
-                +
-              </span>
-            </button>
+                <span className="flex items-center gap-5">
+                  <span
+                    className="tabular-nums shrink-0 opacity-30"
+                    style={{
+                      fontFamily: "var(--font-display)",
+                      fontStyle: "italic",
+                      fontSize: "var(--fs-h3)",
+                      fontWeight: 300,
+                      minWidth: "2.5rem",
+                    }}
+                  >
+                    {clause.clause_no}
+                  </span>
+                  <span className="font-semibold text-base">{clause.title}</span>
+                </span>
+                <span
+                  className="shrink-0 w-6 h-6 flex items-center justify-center rounded-full border border-[color:var(--border)] ml-4 transition-transform duration-300"
+                  style={{
+                    color: "var(--accent)",
+                    transform: isOpen ? "rotate(45deg)" : "none",
+                  }}
+                >
+                  +
+                </span>
+              </button>
 
-            {open === clause.clause_no && (
-              <div className="px-6 pb-5 pt-1 border-t border-[color:var(--border)]">
-                <p className="text-sm leading-relaxed opacity-70 whitespace-pre-line">{clause.body}</p>
-              </div>
-            )}
-          </div>
-        ))}
+              {isOpen && (
+                <div className="pb-6 pl-16 md:pl-20 pr-4 md:pr-8">
+                  <p className="text-sm leading-relaxed opacity-60 whitespace-pre-line">{clause.body}</p>
+                </div>
+              )}
+            </div>
+          );
+        })}
+        <div className="border-t border-[color:var(--border)]" />
       </div>
     </Section>
   );

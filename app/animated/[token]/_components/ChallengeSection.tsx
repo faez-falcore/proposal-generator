@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from "react";
 import type { ProposalCard } from "@/types/animated-proposal";
-import { getIcon } from "@/lib/icon-map";
 import { MOTION } from "../_lib/motion";
 import { Section } from "./_ui/Section";
 import { Eyebrow } from "./_ui/Eyebrow";
@@ -18,14 +17,18 @@ export function ChallengeSection({ problems }: Props) {
     import("gsap").then(({ gsap }) => {
       import("gsap/ScrollTrigger").then(({ ScrollTrigger }) => {
         gsap.registerPlugin(ScrollTrigger);
-        const cards = sectionRef.current?.querySelectorAll(".challenge-card");
-        if (!cards) return;
-        cards.forEach((card, i) => {
-          gsap.fromTo(card, { y: MOTION.yFrom, opacity: 0 }, {
-            y: 0, opacity: 1, duration: MOTION.base,
-            delay: i * MOTION.stagger,
-            ease: MOTION.easeOut,
-            scrollTrigger: { trigger: card, start: MOTION.scrollStart },
+        const rows = sectionRef.current?.querySelectorAll(".challenge-row");
+        if (!rows) return;
+        rows.forEach((row) => {
+          const numeral = row.querySelector(".challenge-numeral");
+          const content = row.querySelector(".challenge-content");
+          gsap.fromTo(numeral, { opacity: 0, x: -48 }, {
+            opacity: 1, x: 0, duration: MOTION.slow, ease: MOTION.easeOut,
+            scrollTrigger: { trigger: row, start: "top 88%" },
+          });
+          gsap.fromTo(content, { opacity: 0, y: MOTION.yFrom }, {
+            opacity: 1, y: 0, duration: MOTION.base, ease: MOTION.easeOut,
+            scrollTrigger: { trigger: row, start: "top 88%" },
           });
         });
       });
@@ -33,27 +36,48 @@ export function ChallengeSection({ problems }: Props) {
   }, []);
 
   return (
-    <Section ref={sectionRef} tone="accent-wash" className="py-20 md:py-28">
+    <Section
+      ref={sectionRef}
+      className="py-20 md:py-28"
+      style={{
+        background: "linear-gradient(to bottom, oklch(from var(--accent-danger) l c h / 0.06) 0%, transparent 45%)",
+      }}
+    >
       <Eyebrow accent>The Challenge</Eyebrow>
 
-      <div className="grid md:grid-cols-3 gap-6 mt-6 md:mt-10">
-        {problems.map((problem, i) => {
-          const Icon = getIcon(problem.icon_key);
-          return (
-            <div
-              key={i}
-              className="challenge-card rounded-[var(--r-card-lg)] p-6 md:p-8 opacity-0"
+      <div className="mt-8 md:mt-12">
+        {problems.map((problem, i) => (
+          <div
+            key={i}
+            className="challenge-row flex items-start gap-4 md:gap-10 py-8 md:py-12 border-t border-[color:var(--border)]"
+          >
+            <span
+              className="challenge-numeral shrink-0 select-none leading-none opacity-0"
               style={{
-                border: "1px solid oklch(from var(--accent-danger) l c h / 0.2)",
-                background: "oklch(from var(--accent-danger) l c h / 0.06)",
+                fontFamily: "var(--font-display)",
+                fontSize: "var(--fs-numeral)",
+                fontWeight: 200,
+                fontStyle: "italic",
+                color: "oklch(from var(--accent-danger) l c h / 0.2)",
+                lineHeight: 0.85,
+                marginTop: "-0.05em",
+                minWidth: "3ch",
               }}
             >
-              <Icon size={28} strokeWidth={1.5} className="mb-6" style={{ color: "var(--accent-danger)" }} />
-              <h3 className="text-base font-semibold mb-3 tracking-tight">{problem.title}</h3>
-              <p className="text-sm leading-relaxed opacity-60">{problem.desc}</p>
+              {String(i + 1).padStart(2, "0")}
+            </span>
+            <div className="challenge-content flex-1 pt-1 opacity-0">
+              <h3
+                className="font-semibold mb-3 leading-tight"
+                style={{ fontSize: "var(--fs-h2)", letterSpacing: "var(--tracking-tight)" }}
+              >
+                {problem.title}
+              </h3>
+              <p className="text-base leading-relaxed opacity-55">{problem.desc}</p>
             </div>
-          );
-        })}
+          </div>
+        ))}
+        <div className="border-t border-[color:var(--border)]" />
       </div>
     </Section>
   );
