@@ -29,7 +29,7 @@ interface ValidationPayload {
   solutions?: Array<{ icon_key?: string | null }>;
   problems?: Array<{ icon_key?: string | null }>;
   total_days?: number | null;
-  timeline_nodes?: Array<unknown>;
+  timeline_nodes?: Array<{ days: number }>;
   retainer_price_cents?: number | null;
   phase_two_teaser?: string | null;
 }
@@ -97,6 +97,15 @@ export function validateAnimatedProposal(
     warnings.push(
       `total_days is not set. Timeline section will display "Project timeline at a glance" instead of a specific duration.`
     );
+  }
+
+  if (payload.total_days && payload.timeline_nodes && payload.timeline_nodes.length > 0) {
+    const lastDay = payload.timeline_nodes[payload.timeline_nodes.length - 1].days;
+    if (lastDay > payload.total_days) {
+      warnings.push(
+        `Last milestone is Day ${lastDay} but total_days is ${payload.total_days}. Milestone exceeds the stated project duration.`
+      );
+    }
   }
 
   if (payload.retainer_price_cents && !payload.phase_two_teaser) {

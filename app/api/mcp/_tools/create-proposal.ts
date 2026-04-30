@@ -55,6 +55,13 @@ function runWarnings(payload: z.infer<typeof payloadSchema>, pkg: any, tos: any)
     warnings.push(`total_days unset — timeline will display "at a glance" instead of specific duration.`);
   }
 
+  if (payload.total_days && payload.timeline_nodes && payload.timeline_nodes.length > 0) {
+    const lastDay = payload.timeline_nodes[payload.timeline_nodes.length - 1].days;
+    if (lastDay > payload.total_days) {
+      warnings.push(`Last milestone is Day ${lastDay} but total_days is ${payload.total_days}. Milestone exceeds stated project duration.`);
+    }
+  }
+
   if (payload.retainer_price_cents && !payload.phase_two_teaser) {
     warnings.push(`Retainer set but phase_two_teaser is empty. Consider adding ongoing engagement context.`);
   }
@@ -65,7 +72,7 @@ function runWarnings(payload: z.infer<typeof payloadSchema>, pkg: any, tos: any)
 export function registerCreateProposalTool(server: McpServer, ctx: McpAuthContext) {
   server.tool(
     "create_animated_proposal",
-    "Validate and create an animated proposal. Returns the proposal URL and any soft warnings. Call this after grounding with list_packages, list_tos_templates, and list_snippets.",
+    "Validate and create an animated proposal. Returns the proposal URL and any soft warnings. BEFORE calling: complete the section-by-section rep interview (identity, problems×3, solutions×3, scope, timeline, commercials, guarantee, T&C clause 03) and show the full draft payload for rep confirmation. timeline_nodes[].days must be cumulative business days from kickoff — first node days:1 (onboarding), strictly increasing. Ground first with list_packages, list_tos_templates, and list_snippets.",
     { payload: payloadSchema },
     async ({ payload }) => {
       const parsed = payloadSchema.safeParse(payload);

@@ -16,7 +16,7 @@ const scopeItemSchema = z.object({
 
 const timelineNodeSchema = z.object({
   label: z.string().min(1),
-  days: z.number().int().positive(),
+  days: z.number().int().min(1),
   desc: z.string().min(1),
 });
 
@@ -49,7 +49,16 @@ export const createAnimatedProposalSchema = z.object({
   scope_subtitle: z.string().optional().nullable(),
   scope_items: z.array(scopeItemSchema).min(1),
 
-  timeline_nodes: z.array(timelineNodeSchema).min(1),
+  timeline_nodes: z.array(timelineNodeSchema)
+    .min(2)
+    .refine(
+      (nodes) => nodes[0].days === 1,
+      { message: "First milestone must be Day 1 (onboarding kickoff)" }
+    )
+    .refine(
+      (nodes) => nodes.every((n, i) => i === 0 || n.days > nodes[i - 1].days),
+      { message: "Milestone days must strictly increase" }
+    ),
   retainer_bullets: z.array(z.string()).default([]),
 
   total_price_cents: z.number().int().positive(),

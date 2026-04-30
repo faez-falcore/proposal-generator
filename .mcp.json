@@ -2,10 +2,7 @@
   "mcpServers": {
     "xma-proposals": {
       "type": "http",
-      "url": "http://localhost:3000/api/mcp",
-      "headers": {
-        "Authorization": "Bearer xma_mcp_sj16zv7naf8oj5drzkvq4fw6maqo2suu"
-      }
+      "url": "http://localhost:3000/api/mcp"
     }
   }
 }
