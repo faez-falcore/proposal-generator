@@ -39,9 +39,10 @@ export async function PATCH(
     }
   }
 
+  const { override_warnings: _ow, ...updateFields } = parsed.data;
   const { data, error } = await supabase
     .from("animated_proposals")
-    .update(parsed.data)
+    .update(updateFields)
     .eq("id", id)
     .select()
     .single();
