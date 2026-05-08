@@ -3,6 +3,7 @@ import { createClient } from "@/utils/supabase/server";
 import { requireAuth } from "@/lib/api-auth";
 import { createAnimatedProposalSchema } from "@/lib/animated-proposal-schema";
 import { validateAnimatedProposal } from "@/lib/animated-proposal-validation";
+import { generateOrderId, getNextSequentialNumber } from "@/lib/orderIdGenerator";
 import { getPostHogClient } from "@/lib/posthog-server";
 
 export async function POST(request: Request) {
@@ -34,9 +35,12 @@ export async function POST(request: Request) {
 
   const { warnings } = validateAnimatedProposal(parsed.data, pkg, tos);
 
+  const seqNum = await getNextSequentialNumber(supabase);
+  const order_id = generateOrderId(seqNum);
+
   const { data, error } = await supabase
     .from("animated_proposals")
-    .insert({ ...insertData, package_id: package_id ?? null, tos_template_id: tos_template_id ?? null, created_by: user!.id, status: "sent" })
+    .insert({ ...insertData, package_id: package_id ?? null, tos_template_id: tos_template_id ?? null, created_by: user!.id, status: "sent", order_id })
     .select()
     .single();
 

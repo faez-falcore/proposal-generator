@@ -5,6 +5,7 @@ import { Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { UnifiedStatusPill } from "@/components/proposal/UnifiedStatusPill";
 import { BrandTag } from "@/components/proposal/BrandTag";
+import { AnimatedPrintButton } from "@/components/animated-proposal/AnimatedPrintButton";
 import type { AnimatedProposal } from "@/types/animated-proposal";
 
 interface Props {
@@ -70,6 +71,7 @@ export function AnimatedDetailHeader({
         <Button variant="outline" size="sm" onClick={onPreview}>
           Preview →
         </Button>
+        <AnimatedPrintButton proposal={proposal} isXmaMedia={proposal.brand === "xma_media"} />
         <Link href={`/proposals/animated/${id}/edit`}>
           <Button variant="outline" size="sm" className="flex items-center gap-2">
             <Edit size={14} />

@@ -147,8 +147,9 @@ export default function AnimatedProposalDetailPage() {
           onPreview={() => window.open(`${publicLink}?preview=1`, "_blank")}
         />
 
-        <div className="grid md:grid-cols-3 gap-4 mb-8">
+        <div className="grid md:grid-cols-4 gap-4 mb-8">
           {[
+            { label: "Order ID", value: proposal.order_id ?? "—" },
             { label: "Total Value", value: fmtPrice(proposal.total_price_cents, proposal.currency) },
             { label: "Created", value: format(new Date(proposal.created_at), "dd MMM yyyy") },
             { label: "Brand", value: proposal.brand === "xma_media" ? "XMA Media" : "XMA Agency" },

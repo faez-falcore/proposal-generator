@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { AnimatedProposal } from "@/types/animated-proposal";
 import { WelcomeOverlay } from "./WelcomeOverlay";
+import { AnimatedPrintButton } from "@/components/animated-proposal/AnimatedPrintButton";
 import { Hero } from "./Hero";
 import { PersonalProblem } from "./PersonalProblem";
 import { ChallengeSection } from "./ChallengeSection";
@@ -32,6 +33,17 @@ export function AnimatedProposalView({ proposal }: Props) {
           companyName={proposal.company_name}
           onDismissed={() => setIntroComplete(true)}
         />
+      )}
+
+      {introComplete && (
+        <div className="fixed top-4 right-4 z-50">
+          <AnimatedPrintButton
+            proposal={proposal}
+            variant="outline"
+            size="sm"
+            className="bg-white/90 text-zinc-900 border-white/30 hover:bg-white backdrop-blur-sm shadow-md"
+          />
+        </div>
       )}
 
       <div className="min-h-screen" style={{ fontFamily: "var(--font-body)" }}>

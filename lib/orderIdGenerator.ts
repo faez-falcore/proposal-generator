@@ -37,42 +37,36 @@ export function generateOrderId(sequentialNumber: number): string {
  */
 export async function getNextSequentialNumber(supabase: any): Promise<number> {
   const currentYear = new Date().getFullYear();
-  const currentMonth = new Date().getMonth() + 1; // JavaScript months are 0-based
+  const currentMonth = new Date().getMonth() + 1;
   const monthStr = String(currentMonth).padStart(2, "0");
+  const pattern = `XMA-${currentYear}-${monthStr}-%`;
 
-  // Get the highest current sequential number for the current year and month
-  const { data, error } = await supabase
-    .from("proposals")
-    .select("order_id")
-    .not("order_id", "is", null)
-    .filter("order_id", "like", `XMA-${currentYear}-${monthStr}-%`)
-    .order("order_id", { ascending: false })
-    .limit(1);
+  const [{ data: classicData }, { data: animatedData }] = await Promise.all([
+    supabase
+      .from("proposals")
+      .select("order_id")
+      .not("order_id", "is", null)
+      .filter("order_id", "like", pattern)
+      .order("order_id", { ascending: false })
+      .limit(1),
+    supabase
+      .from("animated_proposals")
+      .select("order_id")
+      .not("order_id", "is", null)
+      .filter("order_id", "like", pattern)
+      .order("order_id", { ascending: false })
+      .limit(1),
+  ]);
 
-  if (error) {
-    console.error("Error fetching last order ID:", error);
-    // Start from 1 if there's an error
-    return 1;
-  }
+  const candidates = [
+    ...(classicData ?? []),
+    ...(animatedData ?? []),
+  ]
+    .map((row: { order_id: string }) => {
+      const part = row.order_id?.split("-").pop();
+      return part && !isNaN(parseInt(part)) ? parseInt(part) : 0;
+    })
+    .filter((n: number) => n > 0);
 
-  if (!data || data.length === 0) {
-    // No existing order IDs for this month/year, start from 1
-    return 1;
-  }
-
-  try {
-    // Extract the sequential part from the last order ID
-    const lastOrderId = data[0].order_id;
-    const sequentialPart = lastOrderId.split("-").pop();
-
-    if (sequentialPart && !isNaN(parseInt(sequentialPart))) {
-      // Increment the sequence number
-      return parseInt(sequentialPart) + 1;
-    }
-  } catch (err) {
-    console.error("Error parsing last order ID:", err);
-  }
-
-  // Fallback to 1 if we can't parse the last order ID
-  return 1;
+  return candidates.length > 0 ? Math.max(...candidates) + 1 : 1;
 }
