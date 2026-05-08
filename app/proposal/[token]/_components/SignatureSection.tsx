@@ -25,8 +25,9 @@ export function SignatureSection({ proposalId, clientSignedAt, stripeLink, statu
   const [error, setError] = useState<string | null>(null);
   const [accentColor, sectionRef] = useAccentColor();
 
+  const isPaid = status === "paid";
   const canSign = status === "sent" && !signed;
-  const showStripe = signed && !!stripeLink;
+  const showStripe = signed && !!stripeLink && !isPaid;
 
   async function handleSign() {
     if (!sigRef.current || sigRef.current.isEmpty()) {
@@ -61,10 +62,12 @@ export function SignatureSection({ proposalId, clientSignedAt, stripeLink, statu
               ✓
             </div>
             <h2 className="mb-4" style={{ fontFamily: "var(--font-body)", fontSize: "var(--fs-h2)", fontWeight: 700 }}>
-              Proposal Signed
+              {isPaid ? "Payment Received" : "Proposal Signed"}
             </h2>
             <p className="opacity-55 mb-10 text-base">
-              Your signature has been received. We&apos;ll be in touch shortly.
+              {isPaid
+                ? "Your payment has been received. We'll be in touch to kick things off."
+                : "Your signature has been received. We'll be in touch shortly."}
             </p>
             {showStripe && (
               <a
