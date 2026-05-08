@@ -67,7 +67,7 @@ export function InvestmentSection({
 
         {milestoneCents && (
           <p className="mt-5 text-sm opacity-45">
-            First milestone (50%):{" "}
+            First milestone:{" "}
             <span className="font-semibold opacity-80">{fmt(milestoneCents, currency)}</span>
           </p>
         )}
