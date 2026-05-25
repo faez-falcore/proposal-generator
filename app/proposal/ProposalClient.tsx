@@ -15,7 +15,6 @@ import LoadingState from "@/components/proposal/LoadingState";
 import ErrorState from "@/components/proposal/ErrorState";
 import ProposalCTA from "@/components/proposal/ProposalCTA";
 import PrintButton from "@/components/proposal/PrintButton";
-import CountdownTimer from "@/components/proposal/CountdownTimer";
 import { CURRENCIES, CurrencyState } from "@/lib/useCurrencyRates";
 
 const ProposalPage = () => {
@@ -176,8 +175,6 @@ const ProposalPage = () => {
                 },
               },
             ),
-            expiresAt: proposal.expires_at,
-            validityDays: proposal.validity_days,
             proposalDate: proposal.proposal_date,
             tos_template_id: proposal.tos_template_id,
             tos_snapshot: proposal.tos_snapshot,
@@ -247,8 +244,6 @@ const ProposalPage = () => {
     orderId,
     status,
     discounts,
-    expiresAt,
-    validityDays,
     proposalDate: dbProposalDate,
   } = data;
 
@@ -277,19 +272,6 @@ const ProposalPage = () => {
     ? proposalData.clientInfo?.additionalInfo
     : proposalData.additionalInfo;
 
-  // Only use expiration date if it exists in database - don't calculate for old proposals
-  let expirationDate = null;
-  if (expiresAt) {
-    expirationDate = new Date(expiresAt);
-  }
-  // Don't auto-calculate expiration for old proposals - let them exist without countdown
-
-  // Check if proposal is expired
-  const isExpired = expirationDate && new Date() > expirationDate;
-  const isExpiredStatus = status?.toLowerCase() === "expired";
-  const actuallyExpired = isExpired || isExpiredStatus;
-
-  // Check if this is a completed/finalized proposal
   const isAcceptedOrPaid = ["accepted", "paid"].includes(status?.toLowerCase());
 
   const isXmaMedia =
@@ -315,42 +297,6 @@ const ProposalPage = () => {
           isXmaMedia={isXmaMedia}
         />
 
-        {/* Proposal Status and Countdown */}
-        {(actuallyExpired || (expirationDate && !isAcceptedOrPaid)) && (
-          <div className={`mb-8 rounded-lg p-6 shadow-lg border-l-4 ${
-            isXmaMedia
-              ? 'bg-(--card) border-(--primary)'
-              : 'bg-zinc-800 border-orange-500'
-          }`}>
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className={`text-xl font-bold mb-2 ${isXmaMedia ? 'text-(--primary)' : 'text-orange-500'}`}>
-                  {actuallyExpired ? "PROPOSAL EXPIRED" : "PROPOSAL VALIDITY"}
-                </h2>
-                {actuallyExpired ? (
-                  <p className={isXmaMedia ? 'text-(--foreground)/70' : 'text-zinc-300'}>
-                    This proposal has expired and is no longer available for
-                    acceptance. Please contact us to request a new proposal.
-                  </p>
-                ) : (
-                  <p className={isXmaMedia ? 'text-(--foreground)/70' : 'text-zinc-300'}>
-                    This proposal is valid until the countdown reaches zero.
-                  </p>
-                )}
-              </div>
-              {!actuallyExpired && expirationDate && (
-                <div className="text-right">
-                  <div className={`text-sm mb-2 ${isXmaMedia ? 'text-(--foreground)/50' : 'text-zinc-400'}`}>Expires in:</div>
-                  <CountdownTimer
-                    expiresAt={expirationDate.toISOString()}
-                    className={`text-sm${isXmaMedia ? ' xma-media' : ''}`}
-                    status={status}
-                  />
-                </div>
-              )}
-            </div>
-          </div>
-        )}
 
         {additionalInfo && (
           <div className={`mb-8 rounded-lg p-6 shadow-lg ${isXmaMedia ? 'bg-(--card)' : 'bg-zinc-800'}`}>
@@ -520,40 +466,7 @@ const ProposalPage = () => {
           isXmaMedia={isXmaMedia}
         />
 
-        {/* Only show CTA section if proposal is not paid and not expired */}
-        {status !== "paid" && !actuallyExpired && <ProposalCTA isXmaMedia={isXmaMedia} />}
-
-        {/* Show expired message instead of CTA if expired */}
-        {actuallyExpired && status !== "paid" && (
-          <div className="mb-8 bg-red-900/20 border border-red-700 rounded-lg p-6 text-center">
-            <h2 className="text-xl font-bold text-red-500 mb-2">
-              Proposal Expired
-            </h2>
-            <p className="text-zinc-300 mb-4">
-              This proposal has expired and can no longer be accepted.
-            </p>
-            <div className="space-y-2 text-sm text-zinc-400">
-              <p>
-                To proceed with this project, please contact us for a new
-                proposal:
-              </p>
-              <div className="flex justify-center gap-4 mt-4">
-                <a
-                  href="mailto:admin@xma.ae"
-                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded transition-colors inline-flex items-center"
-                >
-                  Email Us
-                </a>
-                <a
-                  href="tel:+971503636856"
-                  className="bg-zinc-700 hover:bg-zinc-600 text-white px-4 py-2 rounded transition-colors inline-flex items-center"
-                >
-                  Call Us
-                </a>
-              </div>
-            </div>
-          </div>
-        )}
+        {status !== "paid" && <ProposalCTA isXmaMedia={isXmaMedia} />}
 
         <ProposalFooter isXmaMedia={isXmaMedia} />
       </div>

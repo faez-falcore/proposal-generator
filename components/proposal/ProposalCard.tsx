@@ -4,13 +4,11 @@ import React, { useState } from "react";
 import Link from "next/link";
 import StatusBadge from "./StatusBadge";
 import ConfirmationDialog from "@/components/ui/ConfirmationDialog";
-import CountdownTimer from "./CountdownTimer";
 import { Card } from "@/components/ui/design-card";
 import {
   Trash2,
   Share2,
   Copy,
-  RefreshCw,
   Edit,
   FileText,
   MoreHorizontal,
@@ -42,8 +40,6 @@ const ProposalCard: React.FC<ProposalCardProps> = ({
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isArchiving, setIsArchiving] = useState(false);
-  const [isRenewing, setIsRenewing] = useState(false);
-  const [renewError, setRenewError] = useState<string | null>(null);
   const [showInvoiceDialog, setShowInvoiceDialog] = useState(false);
 
   const token = proposal.links && proposal.links[0]?.token;
@@ -55,25 +51,6 @@ const ProposalCard: React.FC<ProposalCardProps> = ({
 
   const proposalDate = new Date(proposal.proposal_date).toLocaleDateString();
   const createDate = new Date(proposal.created_at).toLocaleDateString();
-
-  // Use expires_at from database - don't calculate for old proposals
-  let expiresAt: Date | null = null;
-  let hasValidExpiration = false;
-
-  if (proposal.expires_at) {
-    expiresAt = new Date(proposal.expires_at);
-    hasValidExpiration = true;
-  }
-  // Don't auto-calculate for old proposals - let them exist without countdown
-
-  const expirationDate = expiresAt ? expiresAt.toLocaleDateString() : null;
-
-  // Check if proposal is expired (only if it has a valid expiration date)
-  const isExpired = expiresAt ? new Date() > expiresAt : false;
-
-  // Determine if we should show expiration info (hide for accepted/paid proposals and proposals without expiration)
-  const showExpiration =
-    hasValidExpiration && !["accepted", "paid"].includes(status.toLowerCase());
 
   const copyToClipboard = async () => {
     if (!shareableLink) return;
@@ -90,69 +67,6 @@ const ProposalCard: React.FC<ProposalCardProps> = ({
   // Handler for status changes
   const handleStatusChange = (newStatus: string) => {
     setStatus(newStatus);
-  };
-
-  // Handler for when countdown expires
-  const handleCountdownExpire = async () => {
-    if (
-      status !== "expired" &&
-      !["accepted", "paid"].includes(status.toLowerCase())
-    ) {
-      // Update status to expired
-      try {
-        const response = await fetch(`/api/update-proposal-status`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            id: proposal.id,
-            status: "expired",
-          }),
-        });
-
-        if (response.ok) {
-          setStatus("expired");
-        }
-      } catch (error) {
-        console.error("Failed to update proposal status to expired:", error);
-      }
-    }
-  };
-
-  // Handler for renewing expired proposals
-  const handleRenew = async () => {
-    if (!proposal.id) return;
-
-    setIsRenewing(true);
-    setRenewError(null);
-
-    try {
-      const response = await fetch("/api/proposals/renew", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ id: proposal.id }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to renew proposal");
-      }
-
-      // Update status and refresh the component
-      setStatus("draft");
-      // Optionally trigger a page refresh or callback to parent
-      window.location.reload();
-    } catch (error) {
-      console.error("Error renewing proposal:", error);
-      setRenewError(
-        error instanceof Error ? error.message : "Failed to renew proposal",
-      );
-    } finally {
-      setIsRenewing(false);
-    }
   };
 
   // Delete the proposal
@@ -324,20 +238,6 @@ const ProposalCard: React.FC<ProposalCardProps> = ({
             </DropdownItem>
           </Link>
 
-          {/* Renew Option - only for expired proposals */}
-          {hasValidExpiration && (isExpired || status === "expired") && (
-            <>
-              <DropdownSeparator />
-              <DropdownItem onClick={handleRenew} disabled={isRenewing}>
-                <RefreshCw
-                  size={14}
-                  className={`mr-2 ${isRenewing ? "animate-spin" : ""}`}
-                />
-                {isRenewing ? "Renewing..." : "Renew Proposal"}
-              </DropdownItem>
-            </>
-          )}
-
           {/* Delete/Archive Option */}
           <DropdownSeparator />
           {userRole === "admin" ? (
@@ -387,27 +287,8 @@ const ProposalCard: React.FC<ProposalCardProps> = ({
               </>
             )}
           </div>
-          {showExpiration && expiresAt && (
-            <div className="flex items-center gap-2">
-              {!isExpired && status !== "expired" && (
-                <span>Expires in:</span>
-              )}
-              <CountdownTimer
-                expiresAt={expiresAt.toISOString()}
-                onExpire={handleCountdownExpire}
-                className="text-xs"
-                status={status}
-              />
-            </div>
-          )}
         </div>
 
-        {/* Renewal Error */}
-        {renewError && (
-          <div className="mt-2 text-semantic-error text-sm">
-            Error: {renewError}
-          </div>
-        )}
       </div>
 
       {/* Delete/Archive Confirmation Dialog */}

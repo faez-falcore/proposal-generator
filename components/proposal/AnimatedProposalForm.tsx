@@ -140,9 +140,6 @@ export function AnimatedProposalForm({ proposal, packages, tosTemplates }: Props
   const [packageId, setPackageId] = useState(proposal.package_id ?? "");
   const [tosTemplateId, setTosTemplateId] = useState(proposal.tos_template_id ?? "");
   const [stripeLink, setStripeLink] = useState(proposal.stripe_link ?? "");
-  const [expiresAt, setExpiresAt] = useState(
-    proposal.expires_at ? proposal.expires_at.replace("Z", "").slice(0, 16) : ""
-  );
 
   function loadTosTemplate(templateId: string) {
     if (!templateId) return;
@@ -194,7 +191,7 @@ export function AnimatedProposalForm({ proposal, packages, tosTemplates }: Props
         package_id: packageId || null,
         tos_template_id: tosTemplateId || null,
         stripe_link: stripeLink || null,
-        expires_at: expiresAt ? new Date(expiresAt).toISOString() : null,
+        expires_at: null,
       };
 
       await axios.patch(`/api/animated-proposals/${proposal.id}`, payload);
@@ -432,10 +429,6 @@ export function AnimatedProposalForm({ proposal, packages, tosTemplates }: Props
 
       <Section title="Meta" defaultOpen={false}>
         <Field label="Stripe Payment Link"><Input value={stripeLink} onChange={setStripeLink} placeholder="https://buy.stripe.com/…" /></Field>
-        <Field label="Expires At">
-          <input type="datetime-local" value={expiresAt} onChange={e => setExpiresAt(e.target.value)}
-            className="w-full px-3 py-2 bg-surface-elevated border border-border-primary text-text-primary rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-border-focus" />
-        </Field>
       </Section>
 
       {saveError && (
