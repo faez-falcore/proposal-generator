@@ -4,9 +4,6 @@
  *
  * Usage:
  * node seed-admin.js [email] [password]
- *
- * Example:
- * node seed-admin.js admin@xmaagency.com admin123
  */
 
 const { createClient } = require("@supabase/supabase-js");
@@ -24,7 +21,7 @@ if (fs.existsSync(dotenvPath)) {
 }
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_SECRET_KEY;
 
 // Debug info
 console.log(`Supabase URL: ${supabaseUrl || "Not Set"}`);
@@ -34,7 +31,7 @@ console.log(
 
 if (!supabaseUrl || !supabaseServiceKey) {
   console.error(
-    "Error: NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be provided as environment variables.",
+    "Error: NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_SECRET_KEY must be provided as environment variables.",
   );
   process.exit(1);
 }
